@@ -1,6 +1,6 @@
 import time
 from functools import wraps
-
+from collections import OrderedDict, deque
 
 class CacheManager:
     def __init__(self, strategy, cache_depth, ttl):
@@ -8,7 +8,8 @@ class CacheManager:
         self.strategy = strategy
         self.cache_depth = cache_depth
         self.ttl = ttl
-        self.cache = {}
+        self.cache = OrderedDict() if strategy == 'LRU' else {}
+        self.order = deque() if strategy == 'FIFO' else None
 
     def get_cache(self, key):
         """Получить значение из кэша, если оно еще не устарело."""
@@ -16,6 +17,9 @@ class CacheManager:
             value, timestamp = self.cache[key]
             # Проверка на истечение времени жизни
             if (time.time() - timestamp) < self.ttl:
+                # Перемещаем элемент в конец для LRU
+                if self.strategy == 'LRU':
+                    self.cache.move_to_end(key)
                 return value
             else:
                 del self.cache[key]  # Удалить устаревшее значение
@@ -24,14 +28,29 @@ class CacheManager:
     def set_cache(self, key, value):
         """Сохранить значение в кэш."""
         if self.strategy == 'LRU':
-            """ Закомментировано для тестирования (будет добавлено третьим человеком)
-            # self._add_to_lru_cache(key, value)"""
+            self._add_to_lru_cache(key, value)
         elif self.strategy == 'FIFO':
-            """Закомментировано для тестирования (будет добавлено третьим человеком)
-            # self._add_to_fifo_cache(key, value)"""
+            self._add_to_fifo_cache(key, value)
 
+    def _add_to_lru_cache(self, key, value):
+        """Добавить значение в кэш с использованием стратегии LRU."""
+        # Проверка на максимальную глубину кэша
+        if len(self.cache) >= self.cache_depth:
+            self.cache.popitem(last=False)  # Удалить самый старый элемент
+        self.cache[key] = (value, time.time())
+        self.cache.move_to_end(key)
 
-def cache_decorator(strategy='LRU', cache_depth=10, ttl=60): # Значения по умолчанию
+    def _add_to_fifo_cache(self, key, value):
+        """Добавить значение в кэш с использованием стратегии FIFO."""
+        # Проверка на максимальную глубину кэша
+        if len(self.cache) >= self.cache_depth:
+            oldest_key = self.order.popleft()
+            del self.cache[oldest_key]
+        self.cache[key] = (value, time.time())
+        self.order.append(key)
+
+# Декоратор для кэширования
+def cache_decorator(strategy='LRU', cache_depth=10, ttl=60):  # Значения по умолчанию
     """Декоратор для кэширования результатов функций."""
     cache_managers = {}
 
@@ -56,3 +75,8 @@ def cache_decorator(strategy='LRU', cache_depth=10, ttl=60): # Значения 
         return wrapper
 
     return decorator
+
+# Пример тестовой функции
+@cache_decorator(strategy='LRU', cache_depth=3, ttl=5)
+def expensive_function(x):
+    return x * x
