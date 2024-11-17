@@ -75,8 +75,3 @@ def cache_decorator(strategy='LRU', cache_depth=10, ttl=60):  # Значения
         return wrapper
 
     return decorator
-
-# Пример тестовой функции
-@cache_decorator(strategy='LRU', cache_depth=3, ttl=5)
-def expensive_function(x):
-    return x * x
