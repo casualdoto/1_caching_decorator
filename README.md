@@ -116,6 +116,7 @@ print(add(5, 6))  # 11 (вытесняет старое значение)
 ```
 
 ### Удаление элементов по TTL
+```python
 from cache_decorator import cache_decorator
 import time
 
