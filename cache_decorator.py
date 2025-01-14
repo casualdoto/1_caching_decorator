@@ -45,7 +45,8 @@ class CacheManager:
         # Проверка на максимальную глубину кэша
         if len(self.cache) >= self.cache_depth:
             oldest_key = self.order.popleft()
-            del self.cache[oldest_key]
+            if oldest_key in self.cache:  # Проверяем, что ключ существует в кэше
+                del self.cache[oldest_key]
         self.cache[key] = (value, time.time())
         self.order.append(key)
 
