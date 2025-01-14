@@ -7,13 +7,17 @@ Tonya-Lyub - Антонина Любецкая
 
 shmel9va - Шмелева Мария
 
-Репозитории с задачами:
+**Репозитории с задачами**:
 
 1_quaternions - https://github.com/casualdoto/1_quaternions
 
 1_caching_decorator - https://github.com/casualdoto/1_caching_decorator
 
 1_figures - https://github.com/casualdoto/1_figures
+
+**Репозиторий с курсовой работой**:
+
+SPBPU_3rd_task_library - https://github.com/casualdoto/SPBPU_3rd_task_library
 
 # Декоратор для кэширования
 
