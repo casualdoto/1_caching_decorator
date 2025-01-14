@@ -1,4 +1,4 @@
-# 1_quaternions
+# 1_caching_decorator
 группа 5130203/20101
 
 casualdoto - Хрестьяновский Даниил
